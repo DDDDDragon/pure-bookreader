@@ -1,4 +1,136 @@
 /* eslint-disable no-unused-vars */
+const fs = require("fs-extra")
+const path = require("path")
+
+
+function createTip(message)
+{
+    var tips = document.getElementsByClassName("tip")
+    console.log("adadadadad")
+    for(var i of tips) 
+    {
+        i.remove()
+    }
+    var tip = document.createElement("div")
+    tip.classList.add("tip")
+    var span = document.createElement("span")
+    span.innerHTML = message
+    var span2 = document.createElement("span")
+    span2.classList.add("icon")
+    var ii = document.createElement("i")
+    ii.classList.add("gg-danger")
+    span2.appendChild(ii)
+    tip.appendChild(span2)
+    
+    var close = document.createElement("span")
+    close.classList.add("icon")
+    close.id = "close"
+    close.onclick = function(){
+        close.parentNode.remove()
+    }
+    var ii2 = document.createElement("i")
+    ii2.classList.add("gg-close")
+    close.appendChild(ii2)
+    tip.appendChild(close)
+    tip.appendChild(span)
+    document.body.appendChild(tip)
+}
+// eslint-disable-next-line no-unused-vars
+function createMod()
+{
+    var tmlPath, modName, displayName, authorName
+    tmlPath = document.getElementById("tmlPath").value
+    console.log(tmlPath)
+    if(tmlPath == "")
+    {
+        createTip("请输入tModLoader路径")
+        return
+    }
+    modName = document.getElementById("modName").value
+    displayName = document.getElementById("modDName").value
+    authorName = document.getElementById("authorName").value
+    var modSourcesPath = path.join(tmlPath, "ModSources")
+    if(!fs.existsSync(modSourcesPath))
+    {
+        createTip("tModLoader路径不正确")
+        return
+    }
+    var modPath = path.join(modSourcesPath, modName)
+
+    if(!fs.existsSync(modPath))
+    {
+        fs.mkdirSync(modPath);
+        fs.appendFileSync(path.join(modPath, "build.txt"), "displayName = " + displayName + "\n", {});
+        fs.appendFileSync(path.join(modPath, "build.txt"), "author = " + authorName + "\n");
+        fs.appendFileSync(path.join(modPath, "build.txt"), "version = 0.1");
+        fs.appendFileSync(path.join(modPath, "description.txt"), displayName + " is a pretty cool mod, it does...this. Modify this file with a description of your mod");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "using Terraria.ModLoader;\n\n");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "namespace " + modName + "\n");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "{\n");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "    public class " + modName + " : Mod\n");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "    {\n");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "    }\n");
+        fs.appendFileSync(path.join(modPath, modName + ".cs"), "}");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "<Project Sdk=\"Microsoft.NET.Sdk\">\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  <Import Project=\"..\\tModLoader.targets\" />\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  <PropertyGroup>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <AssemblyName>ab</AssemblyName>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <TargetFramework>net6.0</TargetFramework>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <PlatformTarget>AnyCPU</PlatformTarget>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <LangVersion>latest</LangVersion>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  </PropertyGroup>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  <ItemGroup>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <PackageReference Include=\"tModLoader.CodeAssist\" Version=\"0.1.*\" />\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  </ItemGroup>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "</Project>");
+        fs.mkdirSync(path.join(modPath, "Properties"));
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "{\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "  \"profiles\": {\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "    \"Terraria\": {\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"commandName\": \"Executable\",\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"executablePath\": \"dotnet\",\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"commandLineArgs\": \"$(tMLPath)\",\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"workingDirectory\": \"$(tMLSteamPath)\"\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "    },\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "    \"TerrariaServer\": {\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"commandName\": \"Executable\",\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"executablePath\": \"dotnet\",\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"commandLineArgs\": \"$(tMLServerPath)\",\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "      \"workingDirectory\": \"$(tMLSteamPath)\"\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "    }\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "  }\n");
+        fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "}");
+        fs.mkdirSync(path.join(modPath, ".vscode"));
+        fs.appendFileSync(path.join(modPath, ".vscode", "launch.json"), " ");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "{");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "    \"version\": \"2.0.0\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "    \"tasks\": [\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "        {\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"label\": \"build\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"type\": \"shell\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"command\": \"msbuild\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"args\": [\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "                \"property:GenerateFullPaths=true\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "                \"/t:build\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "                \"/consoleloggerparameters:NoSummary\"\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            ],\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"group\": \"build\",\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"presentation\": {\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "                \"reveal\": \"silent\"\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            },\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"problemMatcher\": \"msCompile\"\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "        }\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "    ]\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "}");    
+        createTip("Mod创建成功")
+    }
+    else
+    {
+        createTip("已存在此名称的Mod")
+    }
+}
+
 async function fetchGithub(command, name)
 {
     await fetch("https://api.github.com/repos/DDDDDragon/UnderTheSky/contents/Books")
@@ -21,7 +153,7 @@ async function onclickFs49()
 {
     var frame = document.getElementById("iframe")
     frame.src = "https://fs49.org/sample-page/"
-    localStorage.setItem("docName", "fs49");
+    localStorage.setItem("page", "fs49");
     var ol = document.getElementById("content")
     ol.innerHTML = ""
     ol.appendChild(createH1Link("第一部分——入门", 
@@ -137,6 +269,7 @@ async function onclickRunoob()
 {
     var frame = document.getElementById("iframe")
     frame.src = "https://www.runoob.com/csharp/csharp-tutorial.html"
+    localStorage.setItem("page", "runoob")
     var ol = document.getElementById("content")
     ol.innerHTML = ""
     ol.appendChild(createH1Link("C#教程", 
@@ -249,7 +382,7 @@ function createH1Link(name, childs, childsLink)
             a.classList.add("conItem")
             a.style.borderRadius = "5px"
             a.style.marginBottom = "2px"
-            a.style.fontSize = "16px"
+            a.style.fontSize = "12px"
             //a.style.width = (18 * childs[i].length + 10).toString() + "px"
             a.onclick = function(){
                 onclickA(childsLink[i])
@@ -267,3 +400,101 @@ function onclickA(link)
     frame.src = link
 }
 
+function onclickSearch(name)
+{
+    document.getElementById("modCreater").style.display = "none"
+    switch(name) {
+        case "fs49" :
+            onclickFs49()
+            break
+        case "runoob" :
+            onclickRunoob()
+            break
+    }
+}
+
+function Search() {
+    var input, filter, ul
+    input = document.getElementById("search")
+    filter = input.value
+    ul = document.getElementById("myUL")
+    if(filter == "")
+    {
+        ul.innerHTML = ""
+        return
+    }    
+    for(let i of DocOrigin)
+    {
+        if(i.indexOf(filter) > -1)
+        {
+            if(ul.childElementCount > 0)
+            {
+                for(let item of ul.childNodes)
+                {
+                    if(item.firstChild.innerText == i)
+                    {
+                        ul.removeChild(item)
+                    }
+                }
+            }
+            var a = document.createElement("a")
+            a.innerText = i
+            a.childElementCount
+            a.onclick = function(){
+                onclickSearch(i)
+            }
+            var child = document.createElement("li")
+            child.appendChild(a)
+            ul.appendChild(child)
+        }
+        else
+        {
+            if(ul.childElementCount > 0)
+            {
+                for(let item of ul.childNodes)
+                {
+                    if(item.firstChild.innerText == i) 
+                    {
+                        ul.removeChild(item)
+                    }
+                }
+            }
+        }
+    }
+}
+
+const DocOrigin = ["fs49", "runoob"]
+
+window.onload = function(){
+    //fetchGithub("get", "README.md");
+    //var fs49 = document.getElementById("fs49")
+    //fs49.onclick = onclickFs49
+    //var runoob = document.getElementById("runoob")
+    //runoob.onclick = onclickRunoob
+    localStorage.setItem("page", "none")
+    var search = document.getElementById("search")
+    search.oninput = Search
+    var modCreater = document.getElementById("modCreaterBtn")
+    modCreater.onclick = ModCreater
+    var create = document.getElementById("createMod")
+    document.getElementById("modCreater").style.display = "none"
+    create.onclick = function(){
+        createMod()
+    }
+    window.addEventListener("mousemove", () => {
+        if(localStorage.getItem("page") == "modCreater")
+        {
+            document.getElementById("iframe").style.display = "none"
+        }
+        else
+        {
+            document.getElementById("iframe").style.display = ""
+        }
+    })
+}
+
+function ModCreater()
+{
+    localStorage.setItem("page", "modCreater")
+    document.getElementById("modCreater").style.display = ""
+}

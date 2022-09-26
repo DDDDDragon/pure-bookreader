@@ -3,45 +3,46 @@
     <nav>
         <div class="header">
             <div class="top">
-            <div class="logo"><i class="gg-terminal"></i></div>
-            <div class="return"><i class="gg-log-out"></i></div>
+                <div class="logo"><i class="gg-terminal"></i></div>
+                <div class="return"><i class="gg-log-out"></i></div>
             </div>
-            <div class="search"><span class="icon"><i class="gg-search"></i></span>
-            <input placeholder=" search"/>
+            <div class="search">
+                <span class="icon"><i class="gg-search"></i></span>
+                <input placeholder=" 搜索文档源" id="search"/>
+                <ul class="dropdown">
+                    <div class="dropdown-content" id="myUL">
+                    </div>
+                </ul>
             </div>
         </div>
         <section>
             <div class="list">
-            <div class="item"><span class="icon"><i class="gg-google"></i></span>
-                <div class="text">Google</div>
+            <div class="item">
+                <span class="icon" style="float: right;"><i class="gg-menu-left-alt"></i></span>
+                <div class="text">
+                    <details>
+                        <summary style="font-size: 20px;font-weight: bold;">目录</summary>
+                        <ol id="content">
+                        </ol>
+                    </details>
+                </div>
             </div>
-            <div class="item"><span class="icon"><i class="gg-windows"></i></span>
-                <div class="text">Windows</div>
+            <div class="item"><span class="icon" style="float: right;"><i class="gg-windows"></i></span>
+                <div class="text" id="modCreaterBtn" style="font-size: 20px;font-weight: bold;">创建新mod</div>
             </div>
-            <div class="item"><span class="icon"><i class="gg-npm"></i></span>
+            <div class="item"><span class="icon" style="float: right;"><i class="gg-npm"></i></span>
                 <div class="text">Npm</div>
                 <div class="sub-list">
                 <div class="item">Vue</div>
                 <div class="item">React</div>
-                <div class="item">Pinia</div>
-                <div class="item">Vite</div>
                 </div>
-            </div>
-            <div class="item"><span class="icon"><i class="gg-code-climate"></i></span>
-                <div class="text">Code Climate</div>
-            </div>
-            <div class="item"><span class="icon"><i class="gg-paypal"></i></span>
-                <div class="text">Paypal</div>
-            </div>
-            <div class="item"><span class="icon"><i class="gg-instagram"></i></span>
-                <div class="text">Instagram</div>
             </div>
             </div>
             <div class="list bottom-list">
-            <div class="item"><span class="icon"><i class="gg-cloud"></i></span>
+            <div class="item"><span class="icon" style="float: right;"><i class="gg-cloud"></i></span>
                 <div class="text">Cloud</div>
             </div>
-            <div class="item"><span class="icon"><i class="gg-info"></i></span>
+            <div class="item"><span class="icon" style="float: right;"><i class="gg-info"></i></span>
                 <div class="text">Info</div>
             </div>
             </div>
@@ -57,7 +58,7 @@
     </nav>
 </template>
 <script>
-    export default {};
+    export default{}
 </script>
 <style scoped>
     * {
@@ -65,6 +66,21 @@
   padding: 0;
   box-sizing: border-box;
   outline: none;
+}
+#myUL {
+    /* 移除默认的列表样式 */
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+.dropdown .dropdown-content {
+    display: block;
 }
 html,
 body {
@@ -78,7 +94,7 @@ body {
 nav {
   display: flex;
   flex-direction: column;
-  width: 18rem;
+  width: 25rem;
   height: 50rem;
   background-color: #161818;
   height: 100%;
@@ -86,16 +102,16 @@ nav {
   overflow: hidden;
   color: #8B8E9D;
 }
-nav > header {
+nav > .header {
   padding: 2rem 1.5rem 0;
 }
-nav > header > .top {
+nav > .header > .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 0 0 1rem;
 }
-nav > header > .top > .logo {
+nav > .header > .top > .logo {
   display: grid;
   place-items: center;
   width: 2.5rem;
@@ -105,7 +121,7 @@ nav > header > .top > .logo {
   background-color: #2B67FE;
   border-radius: 0.5rem;
 }
-nav > header > .top > .return {
+nav > .header > .top > .return {
   --ggs: 0.7;
   width: 1.5rem;
   height: 1.5rem;
@@ -115,11 +131,11 @@ nav > header > .top > .return {
   background-color: #303238;
   border-radius: 0.3rem;
 }
-nav > header > .search {
+nav > .header > .search {
   position: relative;
   padding-bottom: 1rem;
 }
-nav > header > .search > .icon {
+nav > .header > .search > .icon {
   display: grid;
   place-items: center;
   position: absolute;
@@ -252,5 +268,136 @@ nav > footer > .button {
   height: 1.5rem;
   background-color: #303238;
   border-radius: 0.3rem;
+}
+.gg-menu-left-alt {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 14px;
+    transform: scale(var(--ggs,1))
+}
+
+.gg-menu-left-alt::after,
+.gg-menu-left-alt::before {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    display: block;
+    height: 2px;
+    border-radius: 4px;
+    background: currentColor
+}
+
+.gg-menu-left-alt::before {
+    width: 16px;
+    box-shadow: 0 12px 0
+}
+
+.gg-menu-left-alt::after {
+    width: 10px;
+    top: 6px
+}
+.gg-terminal {
+ box-sizing: border-box;
+ position: relative;
+ display: block;
+ transform: scale(var(--ggs,1));
+ width: 24px;
+ height: 20px;
+ border: 2px solid;
+ border-radius: 2px
+}
+
+.gg-terminal::after,
+.gg-terminal::before {
+ content: "";
+ display: block;
+ box-sizing: border-box;
+ position: absolute
+}
+
+.gg-terminal::before {
+ border-right: 2px solid;
+ border-bottom: 2px solid;
+ transform: rotate(-45deg);
+ width: 6px;
+ height: 6px;
+ top: 5px;
+ left: 3px
+}
+
+.gg-terminal::after {
+ width: 4px;
+ height: 2px;
+ background: currentColor;
+ top: 10px;
+ left: 11px
+} 
+.gg-log-out {
+ box-sizing: border-box;
+ position: relative;
+ display: block;
+ width: 6px;
+ height: 16px;
+ border: 2px solid;
+ transform: scale(var(--ggs,1));
+ border-right: 0;
+ border-top-left-radius: 2px;
+ border-bottom-left-radius: 2px;
+ margin-left: -10px
+}
+
+.gg-log-out::after,
+.gg-log-out::before {
+ content: "";
+ display: block;
+ box-sizing: border-box;
+ position: absolute
+}
+
+.gg-log-out::after {
+ border-top: 2px solid;
+ border-left: 2px solid;
+ transform: rotate(-45deg);
+ width: 8px;
+ height: 8px;
+ left: 4px;
+ bottom: 2px
+}
+
+.gg-log-out::before {
+ border-radius: 3px;
+ width: 10px;
+ height: 2px;
+ background: currentColor;
+ left: 5px;
+ bottom: 5px
+} 
+.gg-search {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,1));
+    width: 16px;
+    height: 16px;
+    border: 2px solid;
+    border-radius: 100%;
+    margin-left: -4px;
+    margin-top: -4px
+}
+
+.gg-search::after {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    border-radius: 3px;
+    width: 2px;
+    height: 8px;
+    background: currentColor;
+    transform: rotate(-45deg);
+    top: 10px;
+    left: 12px
 }
 </style>
