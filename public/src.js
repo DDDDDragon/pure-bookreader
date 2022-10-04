@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 const fs = require("fs-extra")
 const path = require("path")
-
+const os = require("os")
+const edge = require("electron-edge-js")
+const child_process = require("child_process")
 
 function createTip(message)
 {
@@ -55,6 +57,7 @@ function createMod()
         createTip("tModLoader路径不正确")
         return
     }
+    localStorage.setItem("tmlPath", tmlPath)
     var modPath = path.join(modSourcesPath, modName)
 
     if(!fs.existsSync(modPath))
@@ -75,7 +78,7 @@ function createMod()
         fs.appendFileSync(path.join(modPath, modName + ".csproj"), "<Project Sdk=\"Microsoft.NET.Sdk\">\n");
         fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  <Import Project=\"..\\tModLoader.targets\" />\n");
         fs.appendFileSync(path.join(modPath, modName + ".csproj"), "  <PropertyGroup>\n");
-        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <AssemblyName>ab</AssemblyName>\n");
+        fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <AssemblyName>"+ modName + "</AssemblyName>\n");
         fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <TargetFramework>net6.0</TargetFramework>\n");
         fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <PlatformTarget>AnyCPU</PlatformTarget>\n");
         fs.appendFileSync(path.join(modPath, modName + ".csproj"), "    <LangVersion>latest</LangVersion>\n");
@@ -103,7 +106,7 @@ function createMod()
         fs.appendFileSync(path.join(modPath, "Properties", "launchSettings.json"), "}");
         fs.mkdirSync(path.join(modPath, ".vscode"));
         fs.appendFileSync(path.join(modPath, ".vscode", "launch.json"), " ");
-        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "{");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "{\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "    \"version\": \"2.0.0\",\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "    \"tasks\": [\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "        {\n");
@@ -119,7 +122,7 @@ function createMod()
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"presentation\": {\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "                \"reveal\": \"silent\"\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            },\n");
-        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"problemMatcher\": \"msCompile\"\n");
+        fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "            \"problemMatcher\": \"$msCompile\"\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "        }\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "    ]\n");
         fs.appendFileSync(path.join(modPath, ".vscode", "tasks.json"), "}");    
@@ -131,9 +134,11 @@ function createMod()
     }
 }
 
-async function fetchGithub(command, name)
+var tmlUrl = "https://steamcommunity.com/workshop/browse/?appid=1281930"
+
+async function fetchWorkshop(command, name)
 {
-    await fetch("https://api.github.com/repos/DDDDDragon/UnderTheSky/contents/Books")
+    await fetch("https://steamcommunity.com/workshop/browse/?appid=1281930&searchtext=")
     .then(response => response.json())
     .then(data => {
         var json = JSON.parse(JSON.stringify(data))
@@ -402,7 +407,7 @@ function onclickA(link)
 
 function onclickSearch(name)
 {
-    document.getElementById("modCreater").style.display = "none"
+    turnPage("iframe")
     switch(name) {
         case "fs49" :
             onclickFs49()
@@ -465,36 +470,203 @@ function Search() {
 
 const DocOrigin = ["fs49", "runoob"]
 
+var lastTime = 0
+
 window.onload = function(){
     //fetchGithub("get", "README.md");
     //var fs49 = document.getElementById("fs49")
     //fs49.onclick = onclickFs49
     //var runoob = document.getElementById("runoob")
     //runoob.onclick = onclickRunoob
+
     localStorage.setItem("page", "none")
     var search = document.getElementById("search")
     search.oninput = Search
     var modCreater = document.getElementById("modCreaterBtn")
     modCreater.onclick = ModCreater
     var create = document.getElementById("createMod")
-    document.getElementById("modCreater").style.display = "none"
+    turnPage("iframe")
     create.onclick = function(){
         createMod()
     }
+    var tmlPath = document.getElementById("tmlPath")
+    if(localStorage.getItem("tmlPath") == null) tmlPath.value = tryGetTMLPath()
+    else tmlPath.value = localStorage.getItem("tmlPath")
+
+    var mb = document.getElementById("mb")
+    mb.onclick = function(){
+        
+    }
+
+    var modManager = document.getElementById("modManagerBtn")
+    modManager.onclick = function(){
+        turnPage("modManager")
+        refreshModList()
+    }
+
     window.addEventListener("mousemove", () => {
-        if(localStorage.getItem("page") == "modCreater")
+        if(localStorage.getItem("page") == "modManager" && Date.now() - lastTime >= 1500)
         {
-            document.getElementById("iframe").style.display = "none"
+            refreshModList()
         }
-        else
-        {
-            document.getElementById("iframe").style.display = ""
-        }
+        lastTime = Date.now()
     })
 }
 
+function checkMod(file)
+{
+    var stats = fs.statSync(file)
+    var isDir = stats.isDirectory()
+    if(isDir)
+    {
+        var files = fs.readdirSync(file)
+        if(files.indexOf("build.txt") != -1 && files.indexOf("description.txt") != -1)
+        {
+            for(let item of files)
+            {
+                if(item.includes(".cs"))
+                {
+                    var text = fs.readFileSync(path.join(file, item), "utf-8")
+                    if(text.includes("using Terraria") && text.match("public class .*Mod")) return true
+                }
+            }
+        }
+    }
+}
+
+
 function ModCreater()
 {
-    localStorage.setItem("page", "modCreater")
-    document.getElementById("modCreater").style.display = ""
+    turnPage("modCreater")
+}
+
+function ModManager()
+{
+    
+}
+
+function tryGetTMLPath()
+{
+    var name = os.userInfo().username
+    var pathOri = "C:\\Users\\" + name + "\\Documents\\My Games\\Terraria\\tModLoader"
+    if(fs.existsSync(pathOri))
+    {
+        createTip("尝试自动读取TML路径成功!")
+        localStorage.setItem("tmlPath", pathOri)
+        return pathOri
+    }
+    createTip("尝试自动读取TML路径失败,请手动输入")
+    return ""
+}
+
+function turnPage(page)
+{
+    var reader = document.getElementById("reader")
+    for(let item of reader.childNodes)
+    {
+        if(item.id != page) item.style.display = "none"
+        else 
+        {
+            item.style.display = ""
+            localStorage.setItem("page", page)
+        }
+    }
+}
+
+function compileMod(modPath)
+{
+    var command = "dotnet tModLoader.dll -server -build " + modPath
+    var targets = "";
+    if(localStorage.getItem("tmlPath") != null)
+    {
+        targets = path.join(localStorage.getItem("tmlPath"), "ModSources/tModLoader.targets")
+        localStorage.setItem("ModCwd", fs.readFileSync(targets).toString().match("\".*tModLoader").toString().replace("\"", ""))
+    }
+    var workProcess = child_process.exec(command, {
+        cwd: localStorage.getItem("ModCwd")
+    })
+    var modName = modPath.split("\\")[modPath.split("\\").length - 1]
+    console.log("开始生成mod: " + modName)
+    workProcess.stdout.on("data", function(data){
+        if(data.startsWith("Reading")) console.log("正在读取mod信息...")
+        if(data.startsWith("Building")) console.log("正在构建mod...")
+        if(data.startsWith("Compiling")) console.log("正在编译mod...")
+        if(data.startsWith("Compilation finished with "))
+        {
+            var out = data.replace("Compilation finished with ", "").split(" ")
+            console.log("编译完毕, 共有" + out[0] + "个错误与" + out[3] + "个警告")
+        }
+        if(data.startsWith("Packaging")) console.log("正在打包mod...")
+    })
+    workProcess.stderr.on("data", function(data){
+        console.log(data)
+    })
+    workProcess.stdout.on("end", function(data){
+        console.log("生成完毕")
+    })
+}
+
+function refreshModList()
+{
+    var tmlPath = localStorage.getItem("tmlPath")
+    var modSourcesPath = path.join(tmlPath, "ModSources")
+    var modList = document.getElementById("modList")
+    modList.innerHTML = ""
+    var files = fs.readdirSync(modSourcesPath)
+    for(let item of files)
+    {
+        var filePath = path.join(modSourcesPath, item)
+        if(checkMod(filePath))
+        {
+            var modFile = fs.readdirSync(filePath)
+            var modObject = document.createElement("div")
+            modObject.classList.add("modObject")
+            var modIcon = document.createElement("img")
+            modIcon.classList.add("modIcon")
+            var icon = modFile.filter(f => f.includes("icon.png"))
+            if(icon.length > 0) modIcon.src = path.join(filePath, icon[0])
+            else modIcon.src = process.cwd() + "\\resource\\icon.png"
+            modObject.appendChild(modIcon)
+            var modSettings = document.createElement("div")
+            modSettings.classList.add("modSettings")
+            var build = modFile.filter(f => f.includes("build.txt"))
+            if(build.length > 0) 
+            {
+                var properties = fs.readFileSync(path.join(filePath, build[0])).toString().split("\n")
+                var modDes = document.createElement("span")
+                var modAuthor = document.createElement("span")
+                var modVersion = document.createElement("span")
+                modDes.classList.add("modDes")
+                modAuthor.classList.add("modAuthor")
+                modVersion.classList.add("modVersion")
+                var name = properties.filter(f => f.includes("displayName"))[0].replace(" ", "").split("=")[1]
+                var author = properties.filter(f => f.includes("author"))[0].replace(" ", "").split("=")[1]
+                var version = properties.filter(f => f.includes("version"))[0].replace(" ", "").split("=")[1]
+                modDes.innerText = name
+                modAuthor.innerText = "作者: " + author
+                modVersion.innerText = "版本: " + version
+                var buttons = document.createElement("div")
+                buttons.classList.add("buttons")
+                var editMod = document.createElement("button")
+                editMod.classList.add("editMod", "Modbutton")
+                editMod.innerText = "编辑"
+                editMod.id = "edit$%" + filePath
+                var buildMod = document.createElement("button")
+                buildMod.classList.add("buildMod", "Modbutton")
+                buildMod.innerText = "编译"
+                buildMod.id = "build$%" + filePath
+                buildMod.onclick = function(){
+                    compileMod(this.id.replace("build$%", ""))
+                }
+                buttons.appendChild(editMod)
+                buttons.appendChild(buildMod)
+                modSettings.appendChild(modDes)
+                modSettings.appendChild(modAuthor)
+                modSettings.appendChild(modVersion)
+                modSettings.appendChild(buttons)
+                modObject.appendChild(modSettings)
+            }
+            modList.appendChild(modObject)
+        }
+    }
 }

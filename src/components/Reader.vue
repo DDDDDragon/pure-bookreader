@@ -16,7 +16,28 @@
                 <input id="authorName" type="text" value="GoodAuthor" class="authorName BOX" placeholder="输入作者的名称"><br>
                 <button id="createMod" class="createMod">生成</button>
             </div>
+            <div id="modManager" class="modManager">
+                <table id="modList" class="modList">
+                    <div class="modObject">
+                        <img src="C:\Users\ASUS\Documents\My Games\Terraria\tModLoader\ModSources\ElementMachine\icon.png" class="modIcon">
+                        <div class="modSettings">
+                            <span class="modDes">ElementMachine</span>
+                            <span class="modAuthor">作者: DDDDDragon</span>
+                            <span class="modVersion">版本号: v2.0.0.0</span>
+                            <div class="buttons">
+                                <button class="editMod Modbutton">编辑</button>
+                                <button class="buildMod Modbutton">编译</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modObject">
+
+                    </div>
+                </table>
+            </div>
+            <div class="container" id="container"></div>
             <iframe src="" frameborder="0" class="iframe" id="iframe"></iframe>
+            <div id="container" style="width:800px;height:600px;border:1px solid grey"></div>
         </div>
         <div class="bottom">
 
@@ -26,11 +47,97 @@
 </template>
 <script>
     export default{}
+    
 </script>
 <style>
+    ::-webkit-scrollbar{width:1rem;height:0.6rem;background-color: rgb(54, 57, 63);}
+    ::-webkit-scrollbar-button{width:0.5rem;height:0.6rem}
+    ::-webkit-scrollbar-track{background:0 0}
+    ::-webkit-scrollbar-thumb{background:rgb(86, 96, 74);-webkit-transition:.3s;transition:.3s}
+    ::-webkit-scrollbar-thumb:hover{background-color:rgb(48, 48, 48)}
+    ::-webkit-scrollbar-thumb:active{background-color:rgb(48, 48, 48)}
     .modCreater{
         height: 100%;
         width: 100%;
+    }
+    .modManager{
+        height: 100%;
+        width: 100%;
+    }
+    .modObject{
+        background-color: rgb(35, 37, 39);
+        width: 45%;
+        height: 20%;
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+        margin-top: 1rem;
+        background-color: #282A2E;
+        border-radius: 0.5rem;
+        border: none;
+        font-size: 1rem;
+        color: #8B8E9D;
+        display: flex;
+    }
+    .modSettings{
+        width: 73%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .modDes{
+        color: rgb(212, 212, 212);
+        margin-top: 1.2rem;
+        margin-left: 0.4rem;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .modAuthor{
+        color: rgb(212, 212, 212);
+        margin-top: 0.3rem;
+        margin-left: 0.4rem;
+    }
+    .modVersion{
+        color: rgb(212, 212, 212);
+        margin-top: 0.3rem;
+        margin-left: 0.4rem;
+    }
+    .modIcon{
+        margin: 2rem;
+    }
+    .modList{
+        display: flex;
+        color: rgb(212, 212, 212);
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+        flex-wrap: wrap;
+        align-content: flex-start;
+    }
+    .buttons{
+        margin-left: 0.4rem;
+        height: 2rem;
+    }
+    .editMod{
+        margin-left: 12rem;
+        padding-left: 0.2rem;
+    }
+    .buildMod{
+        margin-left: 1.5rem;
+        padding-left: 0.2rem;
+    }
+    .Modbutton{
+        height: 2rem;
+        width: 5rem;
+        margin-top: 0.2rem;
+        border-radius: 0.5rem;
+        background-color: rgb(47, 49, 54);
+        color: rgb(212, 212, 212);
+        flex: 1;
+        border: none;
+        cursor: pointer;
+    }
+    .Modbutton:hover{
+        background-color: rgb(54, 57, 63);
     }
     .createMod{
         height: 2.5rem;

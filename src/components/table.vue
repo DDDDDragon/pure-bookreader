@@ -27,8 +27,14 @@
                     </details>
                 </div>
             </div>
-            <div class="item"><span class="icon" style="float: right;"><i class="gg-windows"></i></span>
+            <div class="item">
                 <div class="text" id="modCreaterBtn" style="font-size: 20px;font-weight: bold;">创建新mod</div>
+            </div>
+            <div class="item">
+                <div class="text" id="mb" style="font-size: 20px;font-weight: bold;">使用指南</div>
+            </div>
+            <div class="item">
+                <div class="text" id="modManagerBtn" style="font-size: 20px;font-weight: bold;">Mod管理</div>
             </div>
             <div class="item"><span class="icon" style="float: right;"><i class="gg-npm"></i></span>
                 <div class="text">Npm</div>
